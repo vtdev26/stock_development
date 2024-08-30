@@ -10,22 +10,36 @@ const {
   isWithinHOSETradingHours,
   numberWithCommas
 } = require("./Util.js");
+const { format } = require('date-fns');
 
 //Local variable initialize
 let isTest = true;
 let changePc = -11;
 const stockSymbols = "LAS"; // Thay thế bằng danh sách mã chứng khoán thực tế
+const stockChangePcHistory = [];
 
 function createWindow() {
   // Create the browser window.
+  // const mainWindow = new BrowserWindow({
+  //   width: 320,
+  //   height: 615,
+  //   webPreferences: {
+  //     preload: path.join(__dirname, './preload.js'),
+  //     contextIsolation: true, // Cách ly ngữ cảnh
+  //     enableRemoteModule: false,
+  //     nodeIntegration: false, // Vô hiệu hóa tích hợp Node.js
+  //   }
+  // })
+
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 470,
+    height: 900,
+    alwaysOnTop: false, // Đặt cửa sổ luôn ở trên cùng
     webPreferences: {
       preload: path.join(__dirname, './preload.js'),
-      contextIsolation: true,
+      contextIsolation: true, // Cách ly ngữ cảnh
       enableRemoteModule: false,
-      nodeIntegration: false,
+      nodeIntegration: false, // Vô hiệu hóa tích hợp Node.js
     }
   })
 
@@ -33,8 +47,6 @@ function createWindow() {
   mainWindow.loadFile('./public/index.html')
 
   // Open the DevTools.
-  // Bắt đầu gọi hàm với danh sách mã chứng khoán
-  // startFetchingStockPrices(stockSymbols);
   mainWindow.webContents.openDevTools();
 }
 
@@ -43,20 +55,8 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow()
-  // Đăng ký một handler cho 'fetch-stock-data' IPC call
-  // Đăng ký handler IPC
-  ipcMain.handle('fetch-stock-data', async (event, symbol) => {
 
-    try {
-      const url = `https://bgapidatafeed.vps.com.vn/getliststockdata/${symbol}`;
-      const response = await axios.get(url);
-      console.log('Fetched URL:', url);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching stock data from stock company:', error);
-      throw error;
-    }
-  });
+  ipcMainRegister();
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -74,10 +74,45 @@ app.on('window-all-closed', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+function ipcMainRegister() {
+  // Đăng ký một handler cho 'fetch-stock-data' IPC call
+  // Đăng ký handler IPC
+  ipcMain.handle('fetch-stock-data', async (event, symbol) => {
+
+    try {
+      const responseData = startFetchingStockPrices(symbol);
+      return responseData;
+    } catch (error) {
+      console.error('Error fetching stock data from stock company:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('fetch-intraday', async (event, symbol) => {
+    try {
+      const responseData = await getStockIntraday(symbol);
+      return responseData;
+    } catch (error) {
+      console.error('Error fetching Intraday:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('fetch-price-stock-history', async (event, symbol) => {
+    try {
+      const responseData = await getPriceHistory(symbol);
+      return responseData;
+    } catch (error) {
+      console.error('Error fetching Intraday:', error);
+      throw error;
+    }
+  });
+}
+
 // Hàm để gửi thông báo
 function sendNotification(data) {
   notifier.notify({
-    title: 'Thông báo cổ phiếu',
+    title: 'Stock Notification',
     message: `LastPrice: ${data.lastPrice} - ChangePc: ${data.status} ${data.changePc} (${data.status} ${data.ot}) - Volume: ${data.lot}`,
     sound: true, // Phát âm thanh khi có thông báo (có thể bỏ qua nếu không cần)
     wait: true, // Chờ người dùng tương tác với thông báo (true hoặc false)
@@ -100,36 +135,68 @@ async function getStockPriceList(symbol) {
   }
 }
 
-function startFetchingStockPrices(symbol) {
+async function getStockIntraday(symbol) {
   try {
-    setInterval(async () => {
-      if (isWithinHOSETradingHours() || isTest) {
-        const data = await getStockPriceList(symbol);
-        if (data) {
-          console.log("Ping.... ", currentDate());
-          let status = '';
-          if (data[0].r < data[0].lastPrice) {
-            status = '+';
-          }
-          if (data[0].r > data[0].lastPrice) {
-            status = '-';
-          }
-          if (changePc !== data[0].changePc) {
-            changePc = data[0].changePc;
-            sendNotification({
-              lastPrice: data[0].lastPrice,
-              changePc: data[0].changePc,
-              ot: data[0].ot,
-              lot: numberWithCommas(data[0].lot * 10),
-              status: status
-            });
-            // console.log(data);
+    // Gọi API của Vietcap
+    if (isWithinHOSETradingHours() || isTest) {
+      const response = await axios.post(
+        'https://mt.vietcap.com.vn/api/market-watch/LEData/getAll',
+        {
+          symbol: symbol || 'VCB', // Giá trị mặc định là 'VCB' nếu không có
+          limit: 100, // Giá trị mặc định là 100 nếu không có
+          truncTime: null, // Giá trị mặc định là null nếu không có
+        }
+      );
+      // Trả về dữ liệu từ API của Vietcap cho client
+      return response.data;
+    }
+  } catch (error) {
+    console.error(`Error fetching stock price for ${symbol}:`, error);
+    return null;
+  }
+}
 
-            // console.log(`Fetched data for ${symbol}:`, formatData(data));
-          }
+async function getPriceHistory(symbol) {
+  try {
+    const response = await axios.get(`https://s.cafef.vn/Ajax/PageNew/DataHistory/PriceHistory.ashx?Symbol=${symbol}&StartDate=&EndDate=&PageIndex=1&PageSize=40`, {
+      headers: {
+        "accept": "*/*",  // Đảm bảo nhận mọi loại nội dung
+        "Referer": "https://s.cafef.vn/lich-su-giao-dich-las-1.chn"  // Một số server yêu cầu referer để kiểm tra nguồn yêu cầu
+      }
+    });
+    return response.data.Data;
+  } catch (error) {
+    console.error(`Error fetching stock price for ${symbol}:`, error);
+    return null;
+  }
+}
+
+async function startFetchingStockPrices(symbol) {
+  try {
+    if (isWithinHOSETradingHours() || isTest) {
+      const data = await getStockPriceList(symbol);
+      if (data) {
+        let status = '';
+        if (data[0].r < data[0].lastPrice) {
+          status = '+';
+        }
+        if (data[0].r > data[0].lastPrice) {
+          status = '-';
+        }
+        if (changePc !== data[0].changePc) {
+          stockChangePcHistory.push(data);
+          changePc = data[0].changePc;
+          sendNotification({
+            lastPrice: data[0].lastPrice,
+            changePc: data[0].changePc,
+            ot: data[0].ot,
+            lot: numberWithCommas(data[0].lot * 10),
+            status: status
+          });
         }
       }
-    }, 2000); // 5000 milliseconds = 5 seconds
+      return data;
+    }
   } catch (error) {
     log(error);
   }

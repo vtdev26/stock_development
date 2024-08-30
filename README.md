@@ -38,3 +38,24 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 ## License
 
 [CC0 1.0 (Public Domain)](LICENSE.md)
+
+
+
+# Lệhh build app Electron
+# npm install electron-builder --save-dev
+
+Các thay đổi đã thực hiện:
+Thêm mục build: Mục này chứa các cài đặt cần thiết cho việc đóng gói ứng dụng.
+
+appId: ID duy nhất của ứng dụng.
+productName: Tên ứng dụng hiển thị cho người dùng.
+directories.buildResources: Thư mục chứa các tài nguyên bổ sung, như tệp biểu tượng.
+win: Các cài đặt dành riêng cho Windows, bao gồm:
+target: Mục tiêu build là nsis để tạo trình cài đặt Windows.
+icon: Đường dẫn tới biểu tượng .ico cho ứng dụng.
+nsis: Cấu hình chi tiết cho trình cài đặt NSIS, bao gồm:
+oneClick: Thiết lập chế độ cài đặt với nhiều bước.
+perMachine: Cài đặt cho tất cả người dùng (yêu cầu quyền quản trị).
+allowElevation: Yêu cầu quyền quản trị khi cài đặt.
+createDesktopShortcut và createStartMenuShortcut: Tạo shortcut trên desktop và menu Start.
+Thêm script build: Được thêm vào phần scripts để chạy electron-builder dễ dàng qua lệnh npm run build.
