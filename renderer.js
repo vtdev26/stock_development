@@ -324,8 +324,6 @@ function displayPriceStockHistory(data) {
     // Đảm bảo rằng phần tử HTML với id "stock-history-data'" tồn tại
     const stockDataElement = document.getElementById('stock-history-data');
 
-    console.log(data);
-    
     const dataStockHistory = data.Data;
 
     // Lấy thời gian hiện tại
@@ -371,6 +369,59 @@ function displayPriceStockHistory(data) {
             </table>`;
     // Cập nhật nội dung của phần tử "stock-intraday" với bảng HTML đã tạo
     stockDataElement.innerHTML += tableHTML;
+}
+
+function displayVnindexData(data) {
+    // Đảm bảo rằng phần tử HTML với id "stock-data" tồn tại
+    const stockDataElement = document.getElementById('vnindex-data');
+    console.log(stockDataElement);
+    
+
+    // Lấy thời gian hiện tại
+    const updateTime = new Date().toLocaleTimeString();
+
+    if (!data) {
+        return;
+    }
+
+    // Tạo nội dung HTML với bảng
+    const htmlContent = `
+        <h2>Thông tin: ${data.ticker} </h2>
+        <p>Thời gian cập nhật: ${updateTime}</p>
+        <table class="vnindex-table">
+            <tbody>
+                <tr>
+                    <td class="label">Giá tham chiếu</td><td class="value">${data.priceReference}</td>
+                </tr>
+                <tr>
+                    <td class="label">Giá mở cửa</td><td class="value">${data.priceOpen}</td>
+                </tr>
+                <tr>
+                    <td class="label">Giá thấp nhất</td><td class="value">${data.priceHigh}</td>
+                </tr>
+                <tr>
+                    <td class="label">Giá cao nhất</td><td class="value">${data.priceLow}</td>
+                </tr>
+                <tr>
+                    <td class="label">Khối lượng khớp lệnh</td><td class="value">${data.totalVolume}</td>
+                </tr>
+                <tr>
+                    <td class="label">Giá trị khớp lệnh</td><td class="value">${data.totalValue}</td>
+                </tr>
+                <tr>
+                    <td class="label">Số lượng mã tăng</td><td class="value">${data.advances}</td>
+                </tr>
+                <tr>
+                    <td class="label">Số lượng mã tham chiếu</td><td class="value">${data.unChange}</td>
+                </tr>
+                <tr>
+                    <td class="label">Giá lượng mã giảm</td><td class="value">${data.declines}</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+    // Cập nhật nội dung của phần tử HTML
+    stockDataElement.innerHTML = htmlContent;
 }
 
 /*
@@ -481,6 +532,19 @@ async function fetchPriceStockHistory() {
     }
 }
 
+// Hàm lấy dữ liệu lịch VNINDEX
+async function fetchVnIndexInfor() {
+    try {
+        const data = await window.ipcRenderer.invoke('fetch-vnindex-infor');        
+        if (data) {
+            displayVnindexData(data.data);
+        }
+    } catch (error) {
+        // alert('Đã xảy ra lỗi khi lấy dữ liệu. Vui lòng thử lại sau.'); // Thông báo khi có lỗi
+        console.log(error);
+    }
+}
+
 /*
  ======================================= NƠI GỌI HÀM KHỞI TẠO DỮ LIỆU KHI CHẠY ỨNG DỤNG ===========================================================
 */
@@ -490,6 +554,7 @@ fetchAndDisplayStockData();
 fetchIntradayData();
 updateDarkMode();
 fetchPriceStockHistory();
+fetchVnIndexInfor();
 
 // Tạo một interval để gọi hàm fetchAndDisplayStockData mỗi 2 giây
 setInterval(fetchAndDisplayStockData, 10000); // 2000 milliseconds = 2 seconds

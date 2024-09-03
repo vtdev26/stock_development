@@ -1,4 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
+// const utils = require('./Util.js')
 
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
@@ -14,3 +15,6 @@ window.addEventListener('DOMContentLoaded', () => {
 contextBridge.exposeInMainWorld('ipcRenderer', {
   invoke: (channel, data) => ipcRenderer.invoke(channel, data)
 });
+
+// Expose các hàm cần thiết cho renderer
+// contextBridge.exposeInMainWorld('utils', utils);

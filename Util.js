@@ -169,9 +169,20 @@ function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+// Định dạng số với đơn vị tỷ VND
+function formatValuePriceIndex(data) {
+  const formattedNumber = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(data / 1_000_000_000);
+}
+
 module.exports = {
   formatData,
   currentDate,
   isWithinHOSETradingHours,
-  numberWithCommas
+  numberWithCommas,
+  formatValuePriceIndex
 };
