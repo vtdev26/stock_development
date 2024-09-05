@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock Data Visualization</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <!-- Liên kết đến file CSS -->
+  </head>
+  <body>
+    <!-- Bắt đầu phần thân của trang -->
+
+    <div id="main-content">
+      <button id="menuToggle" class="icon-button">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+        >
+          <path
+            fill="currentColor"
+            d="M3 18h18v-2H3zm0-5h18v-2H3zm0-7v2h18V6z"
+          ></path>
+        </svg>
+      </button>
+      <nav id="navMenu" class="nav-menu">
+        <ul>
+          <li><a href="#" id="home">Home</a></li>
+          <li><a href="#" id="stock-info">Stock Information</a></li>
+          <li><a href="#" id="stock-history">Stock History</a></li>
+          <li><a href="#" id="vnindex">VnIndex</a></li>
+          <li><a href="#" id="foreign">GDNN</a></li>
+        </ul>
+      </nav>
+
+      <!-- Nội dung trang Home -->
+      <div id="home-content" class="content-section">
+        <!-- Nội dung trang chính -->
+        <h1>Welcome to Stock Data Visualization</h1>
+      </div>
+
+      <!-- Nội dung trang Stock Information -->
+      <div id="stock-info-content" class="content-section">
+        <div id="index-data-home"></div>
+        <!-- Nội dung trang thông tin cổ phiếu -->
+        <button id="toggleDarkMode" class="icon-button">
+          <i class="fas fa-sun"></i>
+          <i class="fas fa-moon"></i>
+        </button>
+        <input type="text" id="stockSymbol" placeholder="LAS, TCB, VNM" />
+        <button id="fetchStock">GET</button>
+        <div id="stock-data"></div>
+        <div id="stock-intraday">
+          <div id="button-container">
+            <button id="reload-button"></button>
+            <button id="toggle-button"><i class="fas fa-eye-slash"></i></button>
+          </div>
+          <div id="stock-intraday-data"></div>
+        </div>
+        <div class="chart-container">
+          <canvas id="priceChart" class="chart"></canvas>
+          <canvas id="volumeChart" class="chart"></canvas>
+          <canvas id="changeChart" class="chart"></canvas>
+          <canvas id="avgHighLowChart" class="chart"></canvas>
+        </div>
+      </div>
+      <!-- Nội dung trang Stock History -->
+      <div id="stock-history-content" class="content-section">
+        <div id="stock-history-data"></div>
+      </div>
+
+      <!-- Nội dung trang VnIndex -->
+      <div id="vnindex-content" class="content-section">
+        <!-- Nội dung VnIndex -->
+        <div id="vnindex-data"></div>
+      </div>
+
+      <!-- Nội dung trang giao dịch NDT nước ngoài -->
+      <div id="foreign-content" class="content-section">
+        <!-- Nội dung giao dịch NDT nước ngoài -->
+        <div id="foreign-data"></div>
+      </div>
+    </div>
+
+    <!-- Thêm script để renderer.js có thể chạy -->
+    <script src="../renderer.js"></script>
+    <!-- Đảm bảo đường dẫn này đúng với cấu trúc dự án của bạn -->
+    <script src="../node_modules/chart.js/dist/chart.umd.js"></script>
+  </body>
+</html>
