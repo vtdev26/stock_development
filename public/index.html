@@ -34,8 +34,8 @@
           <li><a href="#" id="home">Home</a></li>
           <li><a href="#" id="stock-info">Stock Information</a></li>
           <li><a href="#" id="stock-history">Stock History</a></li>
-          <li><a href="#" id="charts">Charts</a></li>
-          <li><a href="#" id="settings">Settings</a></li>
+          <li><a href="#" id="vnindex">VnIndex</a></li>
+          <li><a href="#" id="foreign">GDNN</a></li>
         </ul>
       </nav>
 
@@ -47,6 +47,7 @@
 
       <!-- Nội dung trang Stock Information -->
       <div id="stock-info-content" class="content-section">
+        <div id="index-data-home"></div>
         <!-- Nội dung trang thông tin cổ phiếu -->
         <button id="toggleDarkMode" class="icon-button">
           <i class="fas fa-sun"></i>
@@ -55,7 +56,13 @@
         <input type="text" id="stockSymbol" placeholder="LAS, TCB, VNM" />
         <button id="fetchStock">GET</button>
         <div id="stock-data"></div>
-        <div id="stock-intraday"></div>
+        <div id="stock-intraday">
+          <div id="button-container">
+            <button id="reload-button"></button>
+            <button id="toggle-button"><i class="fas fa-eye-slash"></i></button>
+          </div>
+          <div id="stock-intraday-data"></div>
+        </div>
         <div class="chart-container">
           <canvas id="priceChart" class="chart"></canvas>
           <canvas id="volumeChart" class="chart"></canvas>
@@ -68,10 +75,16 @@
         <div id="stock-history-data"></div>
       </div>
 
-      <!-- Nội dung trang Settings -->
-      <div id="settings-content" class="content-section">
-        <!-- Nội dung cài đặt -->
+      <!-- Nội dung trang VnIndex -->
+      <div id="vnindex-content" class="content-section">
+        <!-- Nội dung VnIndex -->
         <div id="vnindex-data"></div>
+      </div>
+
+      <!-- Nội dung trang giao dịch NDT nước ngoài -->
+      <div id="foreign-content" class="content-section">
+        <!-- Nội dung giao dịch NDT nước ngoài -->
+        <div id="foreign-data"></div>
       </div>
     </div>
 

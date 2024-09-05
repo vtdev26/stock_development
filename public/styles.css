@@ -185,7 +185,7 @@ button:active {
   color: #e1ec3e; /* Màu vàng cho giá trị trung tính */
 }
 
-.button-container {
+#button-container {
   display: flex;
   align-items: center; /* Căn chỉnh các nút theo chiều dọc */
   gap: 10px; /* Khoảng cách giữa các nút */
