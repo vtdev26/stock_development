@@ -176,7 +176,20 @@ function formatValuePriceIndex(data) {
     currency: 'VND',
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(data / 1_000_000_000);
+  }).format(data / 1e6);
+  return formattedNumber;
+}
+
+function getTodayFormat(date) {
+  const day = date.getDate().toString().padStart(2, '0'); // Ngày, đảm bảo có 2 chữ số
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Tháng (thêm 1 vì getMonth() trả về giá trị từ 0-11)
+  const year = date.getFullYear(); // Năm
+
+  return `${month}/${day}/${year}`;
+}
+
+function formatPercent(data, number) {
+  return Math.round(data * number) / number;
 }
 
 module.exports = {
@@ -184,5 +197,7 @@ module.exports = {
   currentDate,
   isWithinHOSETradingHours,
   numberWithCommas,
-  formatValuePriceIndex
+  formatValuePriceIndex,
+  getTodayFormat,
+  formatPercent
 };

@@ -39,6 +39,14 @@
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico"
-    }
+    },
+    "files": [
+      "dist/",
+      "main.js",
+      "Util.js",
+      "preload.js",
+      "public/**",
+      "renderer.js"
+    ]
   }
 }

@@ -82,54 +82,26 @@ function displayStockData(data) {
 }
 
 function displayStockIntraday(data) {
-    const stockDataElement = document.getElementById('stock-intraday');
+    const stockDataElement = document.getElementById('stock-intraday-data');
 
     // Lấy thời gian hiện tại
     const updateTime = new Date().toLocaleTimeString();
 
+    const table = document.getElementById('stock-data-table');
+    let style = 'table';    
+    if (table) {
+        style = table.style.display;
+    }
     // Xóa nội dung hiện tại của phần tử container
     stockDataElement.innerHTML = '';
 
-    // Tạo phần tử bao bọc các nút
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('button-container'); // Thêm lớp CSS cho phần tử bao bọc
-
     // Tạo nút Reload
-    const reloadButton = document.createElement('button');
+    const reloadButton = document.getElementById('reload-button');
     reloadButton.innerHTML = `<i class="fas fa-sync-alt"></i> ${updateTime}`; // Thêm biểu tượng vào nút
-    reloadButton.id = 'reload-button';
-    // Thêm sự kiện click cho nút reload
-    reloadButton.addEventListener('click', () => {
-        fetchIntradayData();
-    });
-
-    const toggleButton = document.createElement("button");
-    toggleButton.id = "toggle-button";
-    toggleButton.innerHTML = '<i class="fas fa-eye"></i>'; // Thêm biểu tượng mắt cho nút ẩn/hiện
-
-    // Thêm sự kiện click cho nút ẩn/hiện
-    // toggleButton.onclick = function () {
-    //     const table = document.getElementById('stock-data-table');
-    //     if (table.style.display === "none" || table.style.display === "") {
-    //         table.style.display = "table"; // Hiển thị bảng
-    //         toggleButton.innerHTML = '<i class="fas fa-eye-slash"></i>'; // Đổi biểu tượng thành mắt đóng
-    //     } else {
-    //         table.style.display = "none"; // Ẩn bảng
-    //         toggleButton.innerHTML = '<i class="fas fa-eye"></i>'; // Đổi biểu tượng thành mắt mở
-    //     }
-    // };
-
-
-    // Thêm nút Reload và Toggle vào container
-    buttonContainer.appendChild(reloadButton);
-    buttonContainer.appendChild(toggleButton);
-
-    // Thêm phần tử bao bọc vào container chính
-    stockDataElement.appendChild(buttonContainer);
 
     // Tạo bảng HTML với phần đầu
     let tableHTML = `
-        <table id="stock-data-table" border="1" cellspacing="0" cellpadding="5">
+        <table id="stock-data-table" style="display: ${style};" border="1" cellspacing="0" cellpadding="5">
             <thead>
             <tr>
                 <th>Match Volume</th>
@@ -324,13 +296,18 @@ function displayPriceStockHistory(data) {
     // Đảm bảo rằng phần tử HTML với id "stock-history-data'" tồn tại
     const stockDataElement = document.getElementById('stock-history-data');
 
-    const dataStockHistory = data.Data;
+    if (!data) {
+        return;
+    }
+    const dataStockHistory = data.priceHistory;
+    const tradingHistorySummary = data.tradingHistorySummary;
 
     // Lấy thời gian hiện tại
     // const updateTime = new Date().toLocaleTimeString();    
 
     // Tạo bảng HTML với phần đầu
     let tableHTML = `
+        <h2> Dữ liệu thay đổi giá theo ngày </h2>
         <table id="stock-history-table" border="1" cellspacing="0" cellpadding="5">
             <thead>
             <tr>
@@ -367,6 +344,37 @@ function displayPriceStockHistory(data) {
     tableHTML += `
                 </tbody>
             </table>`;
+    tableHTML += `
+    <h2> Lịch sử thay đổi </h2>
+    <table class="trading-history-summary-table">
+            <tbody>
+                <tr>
+                    <td class="label">Ngày</td>
+                    <td class="${tradingHistorySummary.change_day > 0 ? 'green' : tradingHistorySummary.change_day < 0 ? 'red' : 'yellow'}">
+                    ${tradingHistorySummary.change_day}%</td>
+                </tr>
+                <tr>
+                    <td class="label">Tuần</td>
+                    <td class="${tradingHistorySummary.change_week > 0 ? 'green' : tradingHistorySummary.change_week < 0 ? 'red' : 'yellow'}">
+                    ${tradingHistorySummary.change_week}%</td>
+                </tr>
+                <tr>
+                    <td class="label">Tháng</td>
+                    <td class="${tradingHistorySummary.change_month > 0 ? 'green' : tradingHistorySummary.change_month < 0 ? 'red' : 'yellow'}">
+                    ${tradingHistorySummary.change_month}%</td>
+                </tr>
+                <tr>
+                    <td class="label">3 Tháng</td>
+                    <td class="${tradingHistorySummary.change_3_month > 0 ? 'green' : tradingHistorySummary.change_3_month < 0 ? 'red' : 'yellow'}">
+                    ${tradingHistorySummary.change_3_month}%</td>
+                </tr>
+                <tr>
+                    <td class="label">6 Tháng</td>
+                    <td class="${tradingHistorySummary.change_6_month > 0 ? 'green' : tradingHistorySummary.change_6_month < 0 ? 'red' : 'yellow'}">
+                    ${tradingHistorySummary.change_6_month}%</td>
+                </tr>
+            </tbody>
+        </table>`;
     // Cập nhật nội dung của phần tử "stock-intraday" với bảng HTML đã tạo
     stockDataElement.innerHTML += tableHTML;
 }
@@ -374,8 +382,7 @@ function displayPriceStockHistory(data) {
 function displayVnindexData(data) {
     // Đảm bảo rằng phần tử HTML với id "stock-data" tồn tại
     const stockDataElement = document.getElementById('vnindex-data');
-    console.log(stockDataElement);
-    
+    const stockIndexDataHome = document.getElementById('index-data-home');
 
     // Lấy thời gian hiện tại
     const updateTime = new Date().toLocaleTimeString();
@@ -383,6 +390,19 @@ function displayVnindexData(data) {
     if (!data) {
         return;
     }
+    let matchTypeClass = '';
+    if (data.netChange < 0) {
+        matchTypeClass = 'red'; // Lớp CSS cho màu đỏ
+    } else if (data.netChange > 0) {
+        matchTypeClass = 'green'; // Lớp CSS cho màu xanh
+    } else {
+        matchTypeClass = 'yellow'; // Lớp CSS mặc định nếu không có điều kiện
+    }
+
+    const htmlIndexDataHome = `
+        <p>VNINDEX: ${data.priceClose} </p>
+        <p class="${matchTypeClass}">${data.netChange} (${data.pctChange}%)</p>
+    `;
 
     // Tạo nội dung HTML với bảng
     const htmlContent = `
@@ -391,10 +411,16 @@ function displayVnindexData(data) {
         <table class="vnindex-table">
             <tbody>
                 <tr>
-                    <td class="label">Giá tham chiếu</td><td class="value">${data.priceReference}</td>
+                    <td class="label">Giá tham chiếu</td><td class="yellow">${data.priceReference}</td>
                 </tr>
                 <tr>
-                    <td class="label">Giá mở cửa</td><td class="value">${data.priceOpen}</td>
+                    <td class="label">Thay đổi</td><td class="${matchTypeClass}">${data.netChange}</td>
+                </tr>
+                <tr>
+                    <td class="label">Thay đổi (%)</td><td class="${matchTypeClass}">${data.pctChange}%</td>
+                </tr>                
+                <tr>
+                    <td class="label">VNI</td><td class="${matchTypeClass}">${data.priceClose}</td>
                 </tr>
                 <tr>
                     <td class="label">Giá thấp nhất</td><td class="value">${data.priceHigh}</td>
@@ -403,10 +429,11 @@ function displayVnindexData(data) {
                     <td class="label">Giá cao nhất</td><td class="value">${data.priceLow}</td>
                 </tr>
                 <tr>
-                    <td class="label">Khối lượng khớp lệnh</td><td class="value">${data.totalVolume}</td>
+                    <td class="label">Khối lượng khớp lệnh</td><td class="value">${window.utils.numberWithCommas(data.totalVolume)}</td>
                 </tr>
+                
                 <tr>
-                    <td class="label">Giá trị khớp lệnh</td><td class="value">${data.totalValue}</td>
+                    <td class="label">Giá trị khớp lệnh</td><td class="value">${window.utils.formatValuePriceIndex(data.totalValue)}</td>
                 </tr>
                 <tr>
                     <td class="label">Số lượng mã tăng</td><td class="value">${data.advances}</td>
@@ -421,6 +448,79 @@ function displayVnindexData(data) {
         </table>
     `;
     // Cập nhật nội dung của phần tử HTML
+    stockIndexDataHome.innerHTML = htmlIndexDataHome;
+    stockDataElement.innerHTML = htmlContent;
+}
+
+function displayForeignTrade(data) {
+    // Đảm bảo rằng phần tử HTML với id "stock-data" tồn tại
+    const stockDataElement = document.getElementById('foreign-data');
+    // Lấy thời gian hiện tại
+    const updateTime = new Date().toLocaleTimeString();
+
+    if (!data) {
+        return;
+    }
+
+    const dataForeignTrade = data.ListDataNN.slice(0, 29);
+
+    // Tạo nội dung HTML với bảng
+    let htmlContent = `
+    <table id="foreign-table">
+            <tbody>
+              <tr>
+                <td style="color: #ffffff; font-weight: 150">VNINDEX</td>
+                <td>KLGD (Cổ phiếu)</td>
+                <td>GTGD (VNĐ)</td>
+              </tr>
+              <tr>
+                <td style="color: green;">Tổng mua</td>
+                <td>${window.utils.numberWithCommas(data.BuyVolume)} (${window.utils.formatPercent(data.BuyVolumePercent, 1000)}%)</td>
+                <td>${window.utils.numberWithCommas(data.BuyValue)} (${window.utils.formatPercent(data.BuyValuePercent, 1000)}%)</td>
+              </tr>
+              <tr>
+                <td style="color: rgb(180, 45, 45);">Tổng bán</td>
+                <td>${window.utils.numberWithCommas(data.SellVolume)} (${window.utils.formatPercent(data.SellVolumePercent, 1000)}%)</td>
+                <td>${window.utils.numberWithCommas(data.SellValue)} (${window.utils.formatPercent(data.SellValuePercent, 1000)}%)</td>
+              </tr>
+              <tr>
+                <td>Chênh lệch</td>
+                <td>${window.utils.numberWithCommas(data.DiffVolume)}</td>
+                <td>${window.utils.numberWithCommas(data.DiffValue)}</td>
+              </tr>
+            </tbody>
+          </table>
+          <h3> Thông tin cổ phiếu </h3>
+          <table id="foreign-stock-table" border="1" cellspacing="0" cellpadding="5">
+            <thead>
+            <tr>
+                <th>Mã</th>
+                <th>KL Mua</th>
+                <th>GT Mua</th>
+                <th>KL Bán</th>
+                <th>GT Bán</th>
+            </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Duyệt qua từng phần tử trong dữ liệu để tạo hàng bảng
+    dataForeignTrade.forEach(item => {
+        htmlContent += `
+                    <tr>
+                    <td>${window.utils.numberWithCommas(item.Symbol)}</td>
+                    <td>${window.utils.numberWithCommas(item.BuyVolume)}</td>
+                    <td>${window.utils.numberWithCommas(item.BuyValue)}</td>
+                    <td>${window.utils.numberWithCommas(item.SellVolume)}</td>
+                    <td>${window.utils.numberWithCommas(item.SellValue)}</td>
+                    </tr>`;
+    });
+
+    // Đóng bảng
+    htmlContent += `
+                </tbody>
+            </table>`;
+
     stockDataElement.innerHTML = htmlContent;
 }
 
@@ -442,6 +542,22 @@ document.getElementById('toggleDarkMode').addEventListener('click', () => {
     // Lưu trạng thái dark mode vào localStorage    
     const isDarkMode = document.body.classList.toggle('dark-mode');
     localStorage.setItem('dark-mode', isDarkMode);
+});
+
+document.getElementById('reload-button').addEventListener('click', () => {
+    fetchIntradayData();
+});
+
+document.getElementById('toggle-button').addEventListener('click', () => {
+    const table = document.getElementById('stock-data-table');
+    const toggleButton = document.getElementById('toggle-button')
+    if (table.style.display === "none" || table.style.display === "") {
+        table.style.display = "table"; // Hiển thị bảng
+        toggleButton.innerHTML = '<i class="fas fa-eye-slash"></i>'; // Đổi biểu tượng thành mắt đóng
+    } else {
+        table.style.display = "none"; // Ẩn bảng
+        toggleButton.innerHTML = '<i class="fas fa-eye"></i>'; // Đổi biểu tượng thành mắt mở
+    }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -535,9 +651,22 @@ async function fetchPriceStockHistory() {
 // Hàm lấy dữ liệu lịch VNINDEX
 async function fetchVnIndexInfor() {
     try {
-        const data = await window.ipcRenderer.invoke('fetch-vnindex-infor');        
+        const data = await window.ipcRenderer.invoke('fetch-vnindex-infor');
         if (data) {
             displayVnindexData(data.data);
+        }
+    } catch (error) {
+        // alert('Đã xảy ra lỗi khi lấy dữ liệu. Vui lòng thử lại sau.'); // Thông báo khi có lỗi
+        console.log(error);
+    }
+}
+
+// Hàm lấy dữ liệu giao dịch NDT nước ngoài
+async function fetchForeignTrade() {
+    try {
+        const data = await window.ipcRenderer.invoke('fetch-foreign-trade');
+        if (data) {
+            displayForeignTrade(data.Data);
         }
     } catch (error) {
         // alert('Đã xảy ra lỗi khi lấy dữ liệu. Vui lòng thử lại sau.'); // Thông báo khi có lỗi
@@ -555,7 +684,10 @@ fetchIntradayData();
 updateDarkMode();
 fetchPriceStockHistory();
 fetchVnIndexInfor();
+fetchForeignTrade();
 
 // Tạo một interval để gọi hàm fetchAndDisplayStockData mỗi 2 giây
-setInterval(fetchAndDisplayStockData, 10000); // 2000 milliseconds = 2 seconds
+setInterval(fetchAndDisplayStockData, 2000); // 2000 milliseconds = 2 seconds
 setInterval(fetchIntradayData, 10000);
+setInterval(fetchVnIndexInfor, 5000);
+setInterval(fetchForeignTrade, 600000);
