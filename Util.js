@@ -180,12 +180,25 @@ function formatValuePriceIndex(data) {
   return formattedNumber;
 }
 
-function getTodayFormat(date) {
+function getTodayFormat(date, caseReturn) {
   const day = date.getDate().toString().padStart(2, '0'); // Ngày, đảm bảo có 2 chữ số
   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Tháng (thêm 1 vì getMonth() trả về giá trị từ 0-11)
   const year = date.getFullYear(); // Năm
 
-  return `${month}/${day}/${year}`;
+  if (caseReturn === 'yyyy/mm/dd') {
+    return `${year}/${month}/${day}`;
+  }
+  if (caseReturn === 'yyyy/dd/mm') {
+    return `${year}/${day}/${month}`;
+
+  }
+  if (caseReturn === 'mm/dd/yyyy') {
+    return `${month}/${day}/${year}`;
+  }
+  if (caseReturn === 'dd/mm/yyyy') {
+    return `${day}/${month}/${year}`;
+
+  }
 }
 
 function formatPercent(data, number) {

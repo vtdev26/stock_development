@@ -13,26 +13,14 @@ const {
 } = require("./Util.js");
 const { format } = require("date-fns");
 
+
 //Local variable initialize
 let isTest = true;
 let changePc = -11;
 const stockSymbols = "LAS"; // Thay thế bằng danh sách mã chứng khoán thực tế
 const stockChangePcHistory = [];
 
-function createWindow() {
-  // Create the browser window.
-  // const mainWindow = new BrowserWindow({
-  //   width: 320,
-  //   height: 615,
-  //   webPreferences: {
-  //     preload: path.join(__dirname, './preload.js'),
-  //     contextIsolation: true, // Cách ly ngữ cảnh
-  //     nodeIntegration: true, // Kích hoạt Node.js trong renderer process
-  //     enableRemoteModule: false,
-  //     nodeIntegration: false, // Vô hiệu hóa tích hợp Node.js
-  //   }
-  // })
-
+async function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 470,
     height: 900,
@@ -49,7 +37,7 @@ function createWindow() {
   mainWindow.loadFile("./public/index.html");
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished
@@ -132,6 +120,18 @@ function ipcMainRegister() {
       throw error;
     }
   });
+
+  ipcMain.handle("fetch-top-influence", async () => {
+    try {
+      const responseData = await topStockInfluence();
+      console.log(responseData);
+
+      return responseData;
+    } catch (error) {
+      console.error("Error fetching top influence:", error);
+      throw error;
+    }
+  });
 }
 
 // Hàm để gửi thông báo
@@ -169,7 +169,7 @@ async function getStockIntraday(symbol) {
         "https://mt.vietcap.com.vn/api/market-watch/LEData/getAll",
         {
           symbol: symbol || "VCB", // Giá trị mặc định là 'VCB' nếu không có
-          limit: 100, // Giá trị mặc định là 100 nếu không có
+          limit: null, // Giá trị mặc định là 100 nếu không có
           truncTime: null, // Giá trị mặc định là null nếu không có
         }
       );
@@ -226,7 +226,7 @@ async function getVnIndexInfor() {
 async function getForeignTrade() {
   try {
     const response = await axios.get(
-      `https://s.cafef.vn/Ajax/PageNew/DataGDNN/GDNuocNgoai.ashx?TradeCenter=HOSE&Date=${getTodayFormat(new Date())}`,
+      `https://s.cafef.vn/Ajax/PageNew/DataGDNN/GDNuocNgoai.ashx?TradeCenter=HOSE&Date=${getTodayFormat(new Date(), 'mm/dd/yyyy')}`,
       {
         headers: {
           "accept": "*/*",
@@ -270,6 +270,79 @@ async function getTradingHistorySummary(symbol) {
   }
 }
 
+async function topStockInfluence() {
+  const today = getTodayFormat(new Date(), 'dd/mm/yyyy');
+  let data = 'page=1&pageSize=10&catID=1&date=' + today + '&__RequestVerificationToken=ZDw3gy9pFcmaJ50_0_Vlkj0e-ktIguWPBq0ieNv-0ezVZGZd2uroKe7to1FjlmLy0reDEHaZuVrjKs9f773gQ3bkxD25oLQ7QNW_wLkZqUE1';
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://finance.vietstock.vn/data/TopStockInfluence',
+    headers: {
+      'Accept': '*/*',
+      'Accept-Language': 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
+      'Connection': 'keep-alive',
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Cookie': 'language=vi-VN; Theme=Light; AnonymousNotification=; ASP.NET_SessionId=04tn5swpairqdv5arpsslp0r; __RequestVerificationToken=yf3DJTLnm8TNmBh7cISeJKnkc9UOTSxC--Qqu3C7OaBRYnegE2okNeCRvWUNsCfomTtzdFhjZWj7IQOGz36TYx6F2ib4OseoaHhcaxwj0hU1; _gid=GA1.2.263682259.1725849099; _ga=GA1.1.414344609.1686731431; _ga_EXMM0DKVEX=GS1.1.1725853012.37.1.1725853012.60.0.0',
+      'Origin': 'https://finance.vietstock.vn',
+      'Referer': 'https://finance.vietstock.vn/ket-qua-giao-dich?tab=cp-anh-huong',
+      'Sec-Fetch-Dest': 'empty',
+      'Sec-Fetch-Mode': 'cors',
+      'Sec-Fetch-Site': 'same-origin',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+      'X-Requested-With': 'XMLHttpRequest',
+      'sec-ch-ua': '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"'
+    },
+    data: data
+  };
+  try {
+    const response = await axios.request(config);
+    return response.data; // Trả về dữ liệu nếu cần sử dụng trong phần khác
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return null; // Hoặc xử lý lỗi theo cách khác
+  }
+}
+
+async function KLGDBienDongCP() {
+  const today = getTodayFormat(new Date(), 'dd/mm/yyyy');
+  let data = 'page=1&pageSize=10&catID=1&date=' + today + '&__RequestVerificationToken=ZDw3gy9pFcmaJ50_0_Vlkj0e-ktIguWPBq0ieNv-0ezVZGZd2uroKe7to1FjlmLy0reDEHaZuVrjKs9f773gQ3bkxD25oLQ7QNW_wLkZqUE1';
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://finance.vietstock.vn/data/KQGDBienDongCP',
+    headers: {
+      'Accept': '*/*',
+      'Accept-Language': 'vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5',
+      'Connection': 'keep-alive',
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Cookie': 'language=vi-VN; Theme=Light; AnonymousNotification=; ASP.NET_SessionId=04tn5swpairqdv5arpsslp0r; __RequestVerificationToken=yf3DJTLnm8TNmBh7cISeJKnkc9UOTSxC--Qqu3C7OaBRYnegE2okNeCRvWUNsCfomTtzdFhjZWj7IQOGz36TYx6F2ib4OseoaHhcaxwj0hU1; _gid=GA1.2.263682259.1725849099; _gat_UA-1460625-2=1; _ga=GA1.1.414344609.1686731431; _ga_EXMM0DKVEX=GS1.1.1725853012.37.1.1725853370.48.0.0',
+      'Origin': 'https://finance.vietstock.vn',
+      'Referer': 'https://finance.vietstock.vn/ket-qua-giao-dich?tab=bien-dong-cp',
+      'Sec-Fetch-Dest': 'empty',
+      'Sec-Fetch-Mode': 'cors',
+      'Sec-Fetch-Site': 'same-origin',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+      'X-Requested-With': 'XMLHttpRequest',
+      'sec-ch-ua': '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"'
+    },
+    data: data
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response.data; // Trả về dữ liệu nếu cần sử dụng trong phần khác
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return null; // Hoặc xử lý lỗi theo cách khác
+  }
+}
+
 async function startFetchingStockPrices(symbol) {
   try {
     if (isWithinHOSETradingHours() || isTest) {
@@ -300,5 +373,3 @@ async function startFetchingStockPrices(symbol) {
     console.log(error);
   }
 }
-
-getTradingHistorySummary('LAS');

@@ -5,6 +5,28 @@
 /* Dữ liệu khởi tạo */
 let changePc = -11; // Tỷ lệ thay đổi phần trăm
 let symbolMain = 'LAS'; // Mã cổ phiếu chính
+let currentHomePage = 'stock-info-content';
+//Phan bon: 0 - 10
+//Ban le: 11 - 15
+//BDS: 16 - 25
+//CK: 26 - 39
+//Dau khi: 40 - 47
+//FPT: 48 - 52
+//Bank: 53 - 67
+//Thep: 68 - 70
+//Vingroup: 71 - 73
+//DCT: 74 - 78
+let listSymbol = `LAS,DGC,DCM,BFC,DPM,DDV,CSV,GRV,DPR,PHR,TDP,
+SAB,MSN,MWG,FRT,DGW,
+NLG,NTL,PDR,VHM,DXG,CEO,KDH,DIG,NVL,KBC,
+BVS,ORS,VDS,TVS,CTS,VCI,BSI,HCM,MBS,SHS,VIX,VND,FTS,SSI,
+OIL,BSR,PVB,PLX,PSI,PVT,PVD,PVS,
+FRT,FOX,FOC,FPT,FTS,
+AGR,LPB,ACB,HDB,SSB,VCB,TCB,VPB,BID,MBB,VIB,SHB,STB,MSB,CTG,
+HSG, HPG, NKG,
+VIC,VHM,VRE,
+POW,GAS,GEX,TV2,KSB`;
+
 
 /*
  ======================================= xỬ LÝ HIỂN THỊ DỮ LIỆU LÊN APP (HTML - JS - CSS) ===========================================================
@@ -19,17 +41,17 @@ function displayStockData(data) {
     const { sym, mc, c, f, r, lastPrice, lastVolume, lot, ot, changePc, avePrice, highPrice, lowPrice } = data;
 
     let status = '';
-    let changeClass = 'neutral';
+    let changeClass = 'yellow';
 
     // Xác định tình trạng thay đổi giá
     if (r < lastPrice) {
         status = '+';
-        changeClass = 'positive'; // Áp dụng lớp CSS cho giá trị dương
+        changeClass = 'green'; // Áp dụng lớp CSS cho giá trị dương
     }
 
     if (r > lastPrice) {
         status = '-';
-        changeClass = 'negative'; // Áp dụng lớp CSS cho giá trị âm
+        changeClass = 'red'; // Áp dụng lớp CSS cho giá trị âm
     }
 
     // Lấy thời gian hiện tại
@@ -48,10 +70,10 @@ function displayStockData(data) {
                     <td class="label">Giá cuối cùng</td><td class="value">${lastPrice}</td>
                 </tr>
                 <tr>
-                    <td class="label">Khối lượng giao dịch</td><td class="value">${lastVolume}</td>
+                    <td class="label">Khối lượng giao dịch</td><td class="value">${window.utils.numberWithCommas(lastVolume)}</td>
                 </tr>
                 <tr>
-                    <td class="label">Tổng khối lượng</td><td class="value">${lot * 10}</td>
+                    <td class="label">Tổng khối lượng</td><td class="value">${window.utils.numberWithCommas(lot * 10)}</td>
                 </tr>
                 <tr>
                     <td class="label">Thay đổi</td><td class="value">${ot}</td>
@@ -81,14 +103,157 @@ function displayStockData(data) {
     stockDataElement.innerHTML = htmlContent;
 }
 
+function displayStockDataList(data) {
+    const stockDataList = document.getElementById('stock-data-list');
+    const stockHoaChat = document.getElementById('stock-list-hoa-chat');
+    const stockBanLe = document.getElementById('stock-list-ban-le');
+    const stockBds = document.getElementById('stock-list-bds');
+    const stockCk = document.getElementById('stock-list-chung-khoan');
+    const stockDauKhi = document.getElementById('stock-list-dau-khi');
+    const stockFpt = document.getElementById('stock-list-fpt');
+    const stockBank = document.getElementById('stock-list-bank');
+    const stockThep = document.getElementById('stock-list-thep');
+    const stockVingroup = document.getElementById('stock-list-vingroup');
+    const stockDct = document.getElementById('stock-list-dtc');
+
+    //Phan bon: 0 - 10
+    //Ban le: 11 - 15
+    //BDS: 16 - 25
+    //CK: 26 - 39
+    //Dau khi: 40 - 47
+    //FPT: 48 - 52
+    //Bank: 53 - 67
+    //Thep: 68 - 70
+    //Vingroup: 71 - 73
+    //DCT: 74 - 78
+    const hoaChat = data.slice(0, 10);
+    const banLe = data.slice(10, 15);
+    const bds = data.slice(15, 25);
+    const ck = data.slice(25, 39);
+    const dauKhi = data.slice(39, 47);
+    const fpt = data.slice(47, 52);
+    const bank = data.slice(52, 67);
+    const thep = data.slice(67, 70);
+    const vingroup = data.slice(70, 73);
+    const dct = data.slice(73, 78);
+
+    let tableHoaChatGen = genrateTableStockList(hoaChat, 'Hoá Chất - Phân Bón');
+    let tableBanLeGen = genrateTableStockList(banLe, 'Bán Lẻ');
+    let tableBdsGen = genrateTableStockList(bds, 'Bất Động Sản');
+    let tableCkGen = genrateTableStockList(ck, 'Chứng Khoán');
+    let tableDauKhiGen = genrateTableStockList(dauKhi, 'Dầu Khí');
+    let tableFptGen = genrateTableStockList(fpt, 'FPT');
+    let tableBankGen = genrateTableStockList(bank, 'Ngân Hàng');
+    let tableThepGen = genrateTableStockList(thep, 'Thép');
+    let tableVingroupGen = genrateTableStockList(vingroup, 'VinGroup');
+    let tableDctGen = genrateTableStockList(dct, 'Đầu Tư Công');
+    stockDataList.innerHTML = tableHoaChatGen;
+    stockHoaChat.innerHTML = tableHoaChatGen;
+    stockBanLe.innerHTML = tableBanLeGen;
+    stockBds.innerHTML = tableBdsGen;
+    stockCk.innerHTML = tableCkGen;
+    stockDauKhi.innerHTML = tableDauKhiGen;
+    stockFpt.innerHTML = tableFptGen;
+    stockBank.innerHTML = tableBankGen;
+    stockThep.innerHTML = tableThepGen;
+    stockVingroup.innerHTML = tableVingroupGen;
+    stockDct.innerHTML = tableDctGen;
+}
+
+function genrateTableStockList(data, title) {
+    // Tạo bảng HTML với phần đầu
+    let tableHTML = `
+        <button id="toggle-button-stock-list">
+            ${title}<i class="fas fa-eye-slash"></i>
+        </button>
+       <table id="stock-data-list-table" style="display: table;" border="1" cellspacing="0" cellpadding="5">
+           <thead>
+           <tr>
+               <th>Symbol</th>
+               <th>Price</th>
+               <th>Change</th>
+               <th>Accumulated Volume</th>
+           </tr>
+           </thead>
+           <tbody>`;
+
+    data.forEach(item => {
+        // Lấy ra thông tin chi tiết từ dữ liệu
+        const { sym, mc, c, f, r, lastPrice, lastVolume, lot, ot, changePc, avePrice, highPrice, lowPrice } = item;
+
+        let status = '';
+        let changeClass = 'yellow';
+
+        // Xác định tình trạng thay đổi giá
+        if (r < lastPrice) {
+            status = '+';
+            changeClass = 'green'; // Áp dụng lớp CSS cho giá trị dương
+        }
+
+        if (r > lastPrice) {
+            status = '-';
+            changeClass = 'red'; // Áp dụng lớp CSS cho giá trị âm
+        }
+        tableHTML += `
+               <tr>
+               <td>${sym}</td>
+               <td>${window.utils.numberWithCommas(lastPrice)}</td>
+               <td class="${changeClass}">${status} ${changePc}</td>
+               <td>${window.utils.numberWithCommas(lot * 10)}</td>
+               </tr>`;
+    });
+    // Đóng bảng
+    tableHTML += `
+       </tbody>
+   </table>`;
+
+    return tableHTML;
+}
+
+function displayTopInfluence(data) {
+    const dataElement = document.getElementById('top-influence-data');
+
+    let tableHTML =
+        `<table id="stock-data-list-table" style="display: table;" border="1" cellspacing="0" cellpadding="5">
+    <thead>
+    <tr>
+        <th>Symbol</th>
+        <th>Price</th>
+        <th>Influence %</th>
+        <th>Influence Index</th>
+    </tr>
+    </thead>
+    <tbody>`;
+
+    data.forEach(item => {
+        tableHTML += `
+        <tr>
+        <td>${item.StockCode}</td>
+        <td>${window.utils.numberWithCommas(item.ClosePrice)}</td>
+        <td>${item.InfluencePercent}</td>
+        <td>${item.InfluenceIndex}</td>
+        </tr>`;
+    });
+
+    tableHTML += `
+        </tbody>
+    </table>`;
+
+    dataElement.innerHTML = tableHTML;
+}
+
 function displayStockIntraday(data) {
+
+    // Khởi tạo biến lưu trữ tổng
+    let totalB = 0, totalS = 0, totalUndefine = 0;
+
     const stockDataElement = document.getElementById('stock-intraday-data');
 
     // Lấy thời gian hiện tại
     const updateTime = new Date().toLocaleTimeString();
 
     const table = document.getElementById('stock-data-table');
-    let style = 'table';    
+    let style = 'table';
     if (table) {
         style = table.style.display;
     }
@@ -114,30 +279,59 @@ function displayStockIntraday(data) {
             <tbody>`;
 
     // Duyệt qua từng phần tử trong dữ liệu để tạo hàng bảng
+    let count = 0;
     data.forEach(item => {
+        const matchVolNumber = Number(item.matchVol); // Ép kiểu về số
         let matchTypeClass;
         if (item.matchType === 's') {
+            totalS += matchVolNumber;
             matchTypeClass = 'red'; // Lớp CSS cho màu đỏ
         } else if (item.matchType === 'b') {
+            totalB += matchVolNumber;
             matchTypeClass = 'green'; // Lớp CSS cho màu xanh
         } else {
+            totalUndefine += matchVolNumber;
             matchTypeClass = 'yellow'; // Lớp CSS mặc định nếu không có điều kiện
         }
-        tableHTML += `
-                <tr>
-                <td>${item.matchVol}</td>
-                <td>${item.matchPrice}</td>
-                <td class="${matchTypeClass}">${item.matchType}</td>
-                <td>${item.accumulatedVolume}</td>
-                <td>${new Date(item.createdAt).toLocaleTimeString()}</td>
-                </tr>`;
+        if (count <= 70) {
+            tableHTML += `
+            <tr>
+            <td>${window.utils.numberWithCommas(item.matchVol)}</td>
+            <td>${window.utils.numberWithCommas(item.matchPrice)}</td>
+            <td class="${matchTypeClass}">${item.matchType}</td>
+            <td>${window.utils.numberWithCommas(item.accumulatedVolume)}</td>
+            <td>${new Date(item.createdAt).toLocaleTimeString()}</td>
+            </tr>`;
+        }
+        count++;
     });
 
     // Đóng bảng
     tableHTML += `
                 </tbody>
             </table>`;
+    // Tính tổng chung
+    const totalAll = totalB + totalS + totalUndefine;
+
+    // Tính phần trăm cho từng loại
+    const percentB = (totalB / totalAll) * 100;
+    const percentS = (totalS / totalAll) * 100;
+    const percentUndefine = (totalUndefine / totalAll) * 100;
     // Cập nhật nội dung của phần tử "stock-intraday" với bảng HTML đã tạo
+    const totalBuyElement = document.getElementById('total-buy');
+    const totalSellElement = document.getElementById('total-sell');
+    if (percentB >= 60) {
+        totalBuyElement.classList = 'green';
+        totalSellElement.classList = '';
+    } else if (percentS >= 60) {
+        totalSellElement.classList = 'red';
+        totalBuyElement.classList = '';
+    } else {
+        totalBuyElement.classList = 'yellow';
+        totalSellElement.classList = 'yellow';
+    }
+    totalBuyElement.innerHTML = `TB: ${window.utils.numberWithCommas(totalB)} (${percentB.toFixed(2)}%)`;
+    totalSellElement.innerHTML = `TS: ${window.utils.numberWithCommas(totalS)} (${percentS.toFixed(2)}%)`;
     stockDataElement.innerHTML += tableHTML;
 }
 
@@ -530,9 +724,9 @@ function displayForeignTrade(data) {
 
 // Hàm để lấy dữ liệu cổ phiếu từ symbol text box và gán lại giá trị symbol
 document.getElementById('fetchStock').addEventListener('click', () => {
-    const symbol = document.getElementById('stockSymbol').value;
-    if (symbol) {
-        symbolMain = symbol;
+    const elementListSymbol = document.getElementById('stockSymbol').value;
+    if (elementListSymbol) {
+        symbolMain = elementListSymbol;
     } else {
         alert('Vui lòng nhập mã cổ phiếu.');
     }
@@ -560,7 +754,21 @@ document.getElementById('toggle-button').addEventListener('click', () => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.getElementById("toggle-button-stock-list").addEventListener("click", () => {
+    const table = document.getElementById("stock-data-list-table"); // Chọn bảng
+
+    // Thay đổi biểu tượng và chữ trên nút
+    const toggleButton = document.getElementById('toggle-button-stock-list')
+    if (table.style.display === "none" || table.style.display === "") {
+        table.style.display = "table"; // Hiển thị bảng
+        toggleButton.innerHTML = '<i class="fas fa-eye-slash"></i>'; // Đổi biểu tượng thành mắt đóng
+    } else {
+        table.style.display = "none"; // Ẩn bảng
+        toggleButton.innerHTML = '<i class="fas fa-eye"></i>'; // Đổi biểu tượng thành mắt mở
+    }
+});
+
+document.addEventListener('DOMContentLoaded', async function () {
     const menuToggle = document.getElementById('menuToggle');
     const navMenu = document.getElementById('navMenu');
     const navLinks = document.querySelectorAll('.nav-menu a');
@@ -570,6 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.addEventListener('click', () => {
         navMenu.classList.toggle('active');
     });
+
 
     // Xử lý sự kiện nhấn liên kết trong menu
     navLinks.forEach(link => {
@@ -611,9 +820,10 @@ function updateDarkMode(isDarkMode) {
 // Hàm để lấy dữ liệu cổ phiếu từ main process và hiển thị
 async function fetchAndDisplayStockData() {
     try {
-        const data = await window.ipcRenderer.invoke('fetch-stock-data', symbolMain);
+        const data = await window.ipcRenderer.invoke('fetch-stock-data', listSymbol);
         if (data && data.length > 0) {
             displayStockData(data[0]);
+            displayStockDataList(data);
             // updateCharts(data[0]); // Giả sử `data` là một mảng và sử dụng phần tử đầu tiên
         }
     } catch (error) {
@@ -621,6 +831,7 @@ async function fetchAndDisplayStockData() {
         console.log(error);
     }
 }
+const count = 0;
 
 // Hàm để lấy dữ liệu khớp lệnh của cổ phiếu
 async function fetchIntradayData() {
@@ -674,6 +885,21 @@ async function fetchForeignTrade() {
     }
 }
 
+//Hàm lấy dữ liệu top cổ phiếu ảnh hưởng tới VNINDEX
+async function fetchTopInfluence() {
+    try {
+        const data = await window.ipcRenderer.invoke('fetch-top-influence');
+        console.log("Data", data);
+        
+        if (data) {
+            displayTopInfluence(data);
+        }
+    } catch (error) {
+        // alert('Đã xảy ra lỗi khi lấy dữ liệu. Vui lòng thử lại sau.'); // Thông báo khi có lỗi
+        console.log(error);
+    }
+}
+
 /*
  ======================================= NƠI GỌI HÀM KHỞI TẠO DỮ LIỆU KHI CHẠY ỨNG DỤNG ===========================================================
 */
@@ -685,9 +911,10 @@ updateDarkMode();
 fetchPriceStockHistory();
 fetchVnIndexInfor();
 fetchForeignTrade();
+fetchTopInfluence();
 
 // Tạo một interval để gọi hàm fetchAndDisplayStockData mỗi 2 giây
 setInterval(fetchAndDisplayStockData, 2000); // 2000 milliseconds = 2 seconds
 setInterval(fetchIntradayData, 10000);
 setInterval(fetchVnIndexInfor, 5000);
-setInterval(fetchForeignTrade, 600000);
+setInterval(() => { fetchForeignTrade, fetchTopInfluence }, 300000);
