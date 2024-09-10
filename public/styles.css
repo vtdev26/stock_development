@@ -171,20 +171,6 @@ button:active {
   transform: scale(0.98); /* Thu nhỏ nút một chút khi nhấn */
 }
 
-/* Màu sắc cho thay đổi % */
-/* Định dạng màu sắc cho các giá trị thay đổi trong bảng cổ phiếu */
-.value.positive {
-  color: #6adb3e; /* Màu xanh cho giá trị dương */
-}
-
-.value.negative {
-  color: #a72431; /* Màu đỏ cho giá trị âm */
-}
-
-.value.neutral {
-  color: #e1ec3e; /* Màu vàng cho giá trị trung tính */
-}
-
 #button-container {
   display: flex;
   align-items: center; /* Căn chỉnh các nút theo chiều dọc */
@@ -341,8 +327,34 @@ table {
   border-collapse: collapse; /* Kết hợp các đường biên của bảng */
 }
 
-th, td {
+th,
+td {
   border: 1px solid #ddd; /* Đường biên cho các ô */
   padding: 8px; /* Khoảng cách trong ô */
   text-align: center; /* Căn lề văn bản */
+}
+
+/* Style cho button */
+#toggle-button-stock-list {
+  display: flex;
+  background-color: transparent; /* Không có nền */
+  color: #c2c1c1; /* Màu chữ tương tự h4 */
+  padding: 8px 15px; /* Khoảng cách nội dung bên trong */
+  border: 2px solid #c0c0c0; /* Viền của nút */
+  border-radius: 5px; /* Góc bo tròn */
+  cursor: pointer; /* Con trỏ dạng bàn tay */
+  font-size: 16px; /* Cỡ chữ */
+  font-weight: bold; /* Đậm chữ như h4 */
+  margin-top: 30px;
+  margin-bottom: 3px;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+  vertical-align: middle; /* Canh giữa với h4 */
+}
+
+#toggle-button-stock-list:active {
+  background-color: #646e64; /* Màu khi nhấn */
+}
+
+#toggle-button-stock-list i {
+  margin-left: 5px; /* Khoảng cách giữa icon và chữ */
 }

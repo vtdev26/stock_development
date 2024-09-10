@@ -36,6 +36,8 @@
           <li><a href="#" id="stock-history">Stock History</a></li>
           <li><a href="#" id="vnindex">VnIndex</a></li>
           <li><a href="#" id="foreign">GDNN</a></li>
+          <li><a href="#" id="stock-list">Stock List</a></li>
+          <li><a href="#" id="top-influence">Top Influence</a></li>
         </ul>
       </nav>
 
@@ -60,9 +62,12 @@
           <div id="button-container">
             <button id="reload-button"></button>
             <button id="toggle-button"><i class="fas fa-eye-slash"></i></button>
+            <div id="total-buy"></div>
+            <div id="total-sell"></div>
           </div>
           <div id="stock-intraday-data"></div>
         </div>
+        <div id="stock-data-list"></div>
         <div class="chart-container">
           <canvas id="priceChart" class="chart"></canvas>
           <canvas id="volumeChart" class="chart"></canvas>
@@ -85,6 +90,66 @@
       <div id="foreign-content" class="content-section">
         <!-- Nội dung giao dịch NDT nước ngoài -->
         <div id="foreign-data"></div>
+      </div>
+
+      <!-- Nội dung trang cổ phiếu theo ngành -->
+      <div id="stock-list-content" class="content-section">
+        <!-- Nội dung trang cổ phiếu theo ngành -->
+        <div id="stock-list-hoa-chat">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-ban-le">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-bds">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-chung-khoan">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-dau-khi">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-fpt">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-bank">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-thep">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-vingroup">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        <div id="stock-list-dtc">
+          <button id="toggle-button-stock-list">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Nội dung trang top cổ phiếu ảnh hưởng tới VNINDEX -->
+      <div id="top-influence-content" class="content-section">
+        <div id="top-influence-data"></div>
       </div>
     </div>
 
