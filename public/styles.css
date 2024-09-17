@@ -358,3 +358,28 @@ td {
 #toggle-button-stock-list i {
   margin-left: 5px; /* Khoảng cách giữa icon và chữ */
 }
+
+.tooltip {
+  position: relative; /* Phần tử cha cần có vị trí tương đối để định vị con .tooltiptext */
+}
+
+.tooltiptext {
+  visibility: hidden;
+  width: 170px;
+  background-color: rgb(155, 154, 154);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: -35px; /* Đặt tooltip bên dưới */
+  left: 100%;
+  transform: translateX(-50%);
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
