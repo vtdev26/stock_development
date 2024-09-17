@@ -13,7 +13,6 @@ const {
 } = require("./Util.js");
 const { format } = require("date-fns");
 
-
 //Local variable initialize
 let isTest = true;
 let changePc = -11;
@@ -37,7 +36,7 @@ async function createWindow() {
   mainWindow.loadFile("./public/index.html");
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished
@@ -124,8 +123,16 @@ function ipcMainRegister() {
   ipcMain.handle("fetch-top-influence", async () => {
     try {
       const responseData = await topStockInfluence();
-      console.log(responseData);
+      return responseData;
+    } catch (error) {
+      console.error("Error fetching top influence:", error);
+      throw error;
+    }
+  });
 
+  ipcMain.handle("fetch-top-foreign-trade-daily", async () => {
+    try {
+      const responseData = await getForeignTrade24hMoney();
       return responseData;
     } catch (error) {
       console.error("Error fetching top influence:", error);
@@ -339,6 +346,59 @@ async function KLGDBienDongCP() {
     return response.data; // Trả về dữ liệu nếu cần sử dụng trong phần khác
   } catch (error) {
     console.error('Error fetching data:', error);
+    return null; // Hoặc xử lý lỗi theo cách khác
+  }
+}
+
+async function getForeignTrade24hMoney() {
+  try {
+    const foreignTop = await axios.get('https://api-finance-t19.24hmoney.vn/v2/web/indices/foreign-trading-top-stock-by-time', {
+      params: {
+        code: '10',
+        type: 'today'
+      },
+      headers: {
+        'Accept': 'application/json',
+        'Referer': 'https://24hmoney.vn/',  // Vẫn cần để tránh bị chặn
+      }
+    });
+    const foreignDayWeekMonth = await axios.get('https://api-finance-t19.24hmoney.vn/v1/ios/stock/foreign-trading-series', {
+      params: {
+        symbol: '10',
+      },
+      headers: {
+        'Accept': 'application/json',
+        'Referer': 'https://24hmoney.vn/', // Vẫn cần để tránh bị chặn
+      }
+    });
+    const foreignTradingDaily = await axios.get('https://api-finance-t19.24hmoney.vn/v1/web/indices/foreign-trading', {
+      params: {
+        code: '10' // Chỉ giữ lại tham số cần thiết
+      },
+      headers: {
+        'Accept': 'application/json',
+        'Referer': 'https://24hmoney.vn/', // Vẫn cần để tránh bị chặn
+      }
+    });
+    const response = {
+      foreignTop: {
+        topBuy: foreignTop.data.data.top_buy,
+        topSell: foreignTop.data.data.top_sell
+      },
+      foreignDayWeekMonth:
+      {
+        todayBuyValue: foreignDayWeekMonth.data.data.today_buy_value,
+        weekBuyValue: foreignDayWeekMonth.data.data.week_buy_value,
+        monthBuyValue: foreignDayWeekMonth.data.data.month_buy_value,
+        todaySellValue: foreignDayWeekMonth.data.data.today_sell_value,
+        weekSellValue: foreignDayWeekMonth.data.data.week_sell_value,
+        monthSellValue: foreignDayWeekMonth.data.data.month_sell_value
+      },
+      foreignTradingDaily: foreignTradingDaily.data.data
+    };
+    return response;
+  } catch (error) {
+    console.error('Error fetching ForeignTrade24hMoney:', error);
     return null; // Hoặc xử lý lỗi theo cách khác
   }
 }

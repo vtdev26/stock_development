@@ -8,24 +8,25 @@ let symbolMain = 'LAS'; // Mã cổ phiếu chính
 let currentHomePage = 'stock-info-content';
 //Phan bon: 0 - 10
 //Ban le: 11 - 15
-//BDS: 16 - 25
-//CK: 26 - 39
-//Dau khi: 40 - 47
-//FPT: 48 - 52
-//Bank: 53 - 67
-//Thep: 68 - 70
-//Vingroup: 71 - 73
-//DCT: 74 - 78
+//BDS: 16 - 26
+//CK: 27 - 40
+//Dau khi: 41 - 48
+//FPT: 49 - 53
+//Bank: 54 - 68
+//Thep: 69 - 71
+//Vingroup: 72 - 74
+//DCT: 75 - 80
 let listSymbol = `LAS,DGC,DCM,BFC,DPM,DDV,CSV,GRV,DPR,PHR,TDP,
 SAB,MSN,MWG,FRT,DGW,
-NLG,NTL,PDR,VHM,DXG,CEO,KDH,DIG,NVL,KBC,
+NLG,NTL,PDR,VHM,DXG,CEO,KDH,DIG,NVL,KBC,TCH,
 BVS,ORS,VDS,TVS,CTS,VCI,BSI,HCM,MBS,SHS,VIX,VND,FTS,SSI,
 OIL,BSR,PVB,PLX,PSI,PVT,PVD,PVS,
 FRT,FOX,FOC,FPT,FTS,
 AGR,LPB,ACB,HDB,SSB,VCB,TCB,VPB,BID,MBB,VIB,SHB,STB,MSB,CTG,
 HSG, HPG, NKG,
 VIC,VHM,VRE,
-POW,GAS,GEX,TV2,KSB`;
+POW,GAS,GEX,TV2,KSB,
+VNM,VCB,ACB,BCM,BID,BVH,CTG,FPT,GAS,GVR,HDB,HPG,MBB,MSN,MWG,PLX,POW,SAB,SHB,SSB,SSI,STB,TCB,TPB,VHM,VIB,VIC,VJC,VPB,VRE`;
 
 
 /*
@@ -115,27 +116,29 @@ function displayStockDataList(data) {
     const stockThep = document.getElementById('stock-list-thep');
     const stockVingroup = document.getElementById('stock-list-vingroup');
     const stockDct = document.getElementById('stock-list-dtc');
+    const stockVn30 = document.getElementById('stock-list-VN30');
 
     //Phan bon: 0 - 10
     //Ban le: 11 - 15
-    //BDS: 16 - 25
-    //CK: 26 - 39
-    //Dau khi: 40 - 47
-    //FPT: 48 - 52
-    //Bank: 53 - 67
-    //Thep: 68 - 70
-    //Vingroup: 71 - 73
-    //DCT: 74 - 78
+    //BDS: 16 - 26
+    //CK: 27 - 40
+    //Dau khi: 41 - 48
+    //FPT: 49 - 53
+    //Bank: 54 - 68
+    //Thep: 69 - 71
+    //Vingroup: 72 - 74
+    //DCT: 75 - 80
     const hoaChat = data.slice(0, 10);
     const banLe = data.slice(10, 15);
-    const bds = data.slice(15, 25);
-    const ck = data.slice(25, 39);
-    const dauKhi = data.slice(39, 47);
-    const fpt = data.slice(47, 52);
-    const bank = data.slice(52, 67);
-    const thep = data.slice(67, 70);
-    const vingroup = data.slice(70, 73);
-    const dct = data.slice(73, 78);
+    const bds = data.slice(15, 26);
+    const ck = data.slice(26, 40);
+    const dauKhi = data.slice(40, 48);
+    const fpt = data.slice(48, 53);
+    const bank = data.slice(53, 68);
+    const thep = data.slice(68, 71);
+    const vingroup = data.slice(71, 74);
+    const dct = data.slice(74, 79);
+    const vn30 = data.slice(79, data.length);
 
     let tableHoaChatGen = genrateTableStockList(hoaChat, 'Hoá Chất - Phân Bón');
     let tableBanLeGen = genrateTableStockList(banLe, 'Bán Lẻ');
@@ -147,6 +150,7 @@ function displayStockDataList(data) {
     let tableThepGen = genrateTableStockList(thep, 'Thép');
     let tableVingroupGen = genrateTableStockList(vingroup, 'VinGroup');
     let tableDctGen = genrateTableStockList(dct, 'Đầu Tư Công');
+    let tableVn30 = genrateTableStockList(vn30, "VN30");
     stockDataList.innerHTML = tableHoaChatGen;
     stockHoaChat.innerHTML = tableHoaChatGen;
     stockBanLe.innerHTML = tableBanLeGen;
@@ -158,6 +162,7 @@ function displayStockDataList(data) {
     stockThep.innerHTML = tableThepGen;
     stockVingroup.innerHTML = tableVingroupGen;
     stockDct.innerHTML = tableDctGen;
+    stockVn30.innerHTML = tableVn30;
 }
 
 function genrateTableStockList(data, title) {
@@ -196,7 +201,9 @@ function genrateTableStockList(data, title) {
         }
         tableHTML += `
                <tr>
-               <td>${sym}</td>
+               <td class="tooltip">${sym}
+                 <span class="tooltiptext">${lowPrice} | ${avePrice} | ${highPrice}</span>
+               </td>
                <td>${window.utils.numberWithCommas(lastPrice)}</td>
                <td class="${changeClass}">${status} ${changePc}</td>
                <td>${window.utils.numberWithCommas(lot * 10)}</td>
@@ -240,6 +247,164 @@ function displayTopInfluence(data) {
     </table>`;
 
     dataElement.innerHTML = tableHTML;
+}
+
+function displayForeignTradeDaily(data) {
+    const foreignTop = document.getElementById('foreign-top-data');
+    const foreignDayWeekMonth = document.getElementById('foreign-day-week-month-data');
+    const foreignTradingDaily = document.getElementById('foreign-trading-daily-data');
+
+    let foreignTopHtml = `
+        <button id="toggle-button-stock-list">
+            Top Buy<i class="fas fa-eye-slash"></i>
+        </button>
+       <table style="display: table;" border="1" cellspacing="0" cellpadding="5">
+           <thead>
+           <tr>
+               <th>Symbol</th>
+               <th>Buy</th>
+               <th>Sell</th>
+               <th>Net</th>
+           </tr>
+           </thead>
+           <tbody>`;
+    data.foreignTop.topBuy.forEach(item => {
+        foreignTopHtml += `
+            <tr>
+                <td>${item.symbol}</td>
+               <td class="tooltip">${window.utils.formatPercent(item.buy_val, 100)}
+                 <span class="tooltiptext">${window.utils.numberWithCommas(item.buy_qtty)}</span>
+               </td>
+               <td class="tooltip">${window.utils.formatPercent(item.sell_val, 100)}
+                 <span class="tooltiptext">${window.utils.numberWithCommas(item.sell_qtty)}</span>
+               </td>
+               <td>${window.utils.formatPercent(item.net_val, 1000)}</td>
+            </tr>`;
+    });
+
+    foreignTopHtml += `
+            </tbody>
+        </table>`;
+
+    foreignTopHtml += `
+        <button id="toggle-button-stock-list">
+            Top Sell<i class="fas fa-eye-slash"></i>
+        </button>
+       <table style="display: table;" border="1" cellspacing="0" cellpadding="5">
+           <thead>
+           <tr>
+               <th>Symbol</th>
+               <th>Buy</th>
+               <th>Sell</th>
+               <th>Net</th>
+           </tr>
+           </thead>
+           <tbody>
+    `;
+
+    data.foreignTop.topSell.forEach(item => {
+        foreignTopHtml += `
+            <tr>
+                <td>${item.symbol}</td>
+               <td class="tooltip">${window.utils.formatPercent(item.buy_val, 100)}
+                 <span class="tooltiptext">${window.utils.numberWithCommas(item.buy_qtty)}</span>
+               </td>
+               <td class="tooltip">${window.utils.formatPercent(item.sell_val, 100)}
+                 <span class="tooltiptext">${window.utils.numberWithCommas(item.sell_qtty)}</span>
+               </td>
+               <td>${window.utils.formatPercent(item.net_val, 1000)}</td>
+            </tr>`;
+    });
+
+    foreignTopHtml += `
+            </tbody>
+        </table>`;
+
+    foreignTop.innerHTML = foreignTopHtml;
+
+    let foreignTradingDailyHtml = `
+        <button id="toggle-button-stock-list">
+            Thống kê theo ngày<i class="fas fa-eye-slash"></i>
+        </button>
+        <table style="display: table;" border="1" cellspacing="0" cellpadding="5">
+           <thead>
+           <tr>
+               <th>Date</th>
+               <th>Buy</th>
+               <th>Sell</th>
+               <th>Net</th>
+           </tr>
+           </thead>
+           <tbody>
+    `;
+
+    data.foreignTradingDaily.forEach(item => {
+        foreignTradingDailyHtml += `
+        <tr>
+            <td>${item.date}</td>
+               <td class="tooltip">${window.utils.formatPercent(item.buy_val, 100)}
+                    <span class="tooltiptext">${window.utils.numberWithCommas(item.buy_qtty)}</span>
+               </td>
+               <td class="tooltip">${window.utils.formatPercent(item.sell_val, 100)}
+                    <span class="tooltiptext">${window.utils.numberWithCommas(item.sell_qtty)}</span>
+               </td>
+            <td>${window.utils.formatPercent((item.buy_val - item.sell_val), 1000)}</td>
+        </tr>`;
+    });
+
+    foreignTradingDailyHtml += `
+            </tbody>
+        </table>`;
+
+    foreignTradingDaily.innerHTML = foreignTradingDailyHtml;
+
+    let foreignDayWeekMonthHtml = `
+        <h3>Ngày - Tuần - Tháng</h3>
+        <table style="display: table;" border="1" cellspacing="0" cellpadding="5">
+        <tr>
+            <th colspan="3">Day</th>
+        </tr>
+        <tr>
+            <th style="color: green;">Buy</th>
+            <th style="color: rgb(180, 45, 45);">Sell</th>
+            <th>Total</th>
+        </tr>
+        <tr>
+            <td>${window.utils.formatPercent(data.foreignDayWeekMonth.todayBuyValue, 100)}</td>
+            <td>${window.utils.formatPercent(data.foreignDayWeekMonth.todaySellValue, 100)}</td>
+            <td>${window.utils.formatPercent((data.foreignDayWeekMonth.todayBuyValue - data.foreignDayWeekMonth.todaySellValue), 100)}</td>
+        </tr>
+        <tr>
+            <th colspan="3">Week</th>
+        </tr>
+        <tr>
+            <th style="color: green;">Buy</th>
+            <th style="color: rgb(180, 45, 45);">Sell</th>
+            <th>Total</th>
+        </tr>
+        <tr>
+            <td>${window.utils.formatPercent(data.foreignDayWeekMonth.weekBuyValue, 100)}</td>
+            <td>${window.utils.formatPercent(data.foreignDayWeekMonth.weekSellValue, 100)}</td>
+            <td>${window.utils.formatPercent((data.foreignDayWeekMonth.weekBuyValue - data.foreignDayWeekMonth.weekSellValue), 100)}</td>
+        </tr>
+        <tr>
+            <th colspan="3">Month</th>
+        </tr>
+        <tr>
+            <th style="color: green;">Buy</th>
+            <th style="color: rgb(180, 45, 45);">Sell</th>
+            <th>Total</th>
+        </tr>
+        <tr>
+            <td>${window.utils.formatPercent(data.foreignDayWeekMonth.monthBuyValue, 100)}</td>
+            <td>${window.utils.formatPercent(data.foreignDayWeekMonth.monthSellValue, 100)}</td>
+            <td>${window.utils.formatPercent((data.foreignDayWeekMonth.monthBuyValue - data.foreignDayWeekMonth.monthSellValue), 100)}</td>
+        </tr>
+    </table>`;
+
+    foreignDayWeekMonth.innerHTML = foreignDayWeekMonthHtml;
+    console.log(data);
+
 }
 
 function displayStockIntraday(data) {
@@ -445,8 +610,6 @@ function displayAvgHighLowChart() {
     });
     return avgHighLowChart;
 }
-
-
 
 // Hàm để cập nhật biểu đồ với dữ liệu mới
 function updateCharts(data) {
@@ -889,10 +1052,21 @@ async function fetchForeignTrade() {
 async function fetchTopInfluence() {
     try {
         const data = await window.ipcRenderer.invoke('fetch-top-influence');
-        console.log("Data", data);
-        
         if (data) {
             displayTopInfluence(data);
+        }
+    } catch (error) {
+        // alert('Đã xảy ra lỗi khi lấy dữ liệu. Vui lòng thử lại sau.'); // Thông báo khi có lỗi
+        console.log(error);
+    }
+}
+
+//Hàm lấy dữ liệu thống kê giao dịch nước ngoài
+async function fetchForeignTradeDaily() {
+    try {
+        const data = await window.ipcRenderer.invoke('fetch-top-foreign-trade-daily');
+        if (data) {
+            displayForeignTradeDaily(data);
         }
     } catch (error) {
         // alert('Đã xảy ra lỗi khi lấy dữ liệu. Vui lòng thử lại sau.'); // Thông báo khi có lỗi
@@ -912,9 +1086,10 @@ fetchPriceStockHistory();
 fetchVnIndexInfor();
 fetchForeignTrade();
 fetchTopInfluence();
+fetchForeignTradeDaily();
 
 // Tạo một interval để gọi hàm fetchAndDisplayStockData mỗi 2 giây
 setInterval(fetchAndDisplayStockData, 2000); // 2000 milliseconds = 2 seconds
 setInterval(fetchIntradayData, 10000);
 setInterval(fetchVnIndexInfor, 5000);
-setInterval(() => { fetchForeignTrade, fetchTopInfluence }, 300000);
+setInterval(() => { fetchForeignTrade, fetchTopInfluence, fetchForeignTradeDaily }, 150000);
